@@ -55,7 +55,7 @@ export const List: React.FC<IListProps> = ({
   React.useEffect(() => {
     fetchKnowledgeBankList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
+  }, [filters, language]);
   React.useEffect(() => {
     Promise.all([
       fetchCategories({
@@ -101,6 +101,7 @@ export const List: React.FC<IListProps> = ({
   ) => {
     try {
       setRowsPerPageData(pageSize);
+      setLoading(true);
       const params = createParams({
         isRecent: "true",
         page: (page + 1).toString(),
@@ -165,7 +166,7 @@ export const List: React.FC<IListProps> = ({
               <SearchBar placeholder="search" onChange={onChangeSearch} />
             </CustomForm>
             <Restricted
-              to={`${MODULE_PERMISSION_NAMES.KnowledgeBank}:${PERMISSIONS.Read}`}
+              to={`${MODULE_PERMISSION_NAMES.KnowledgeBank}:${PERMISSIONS.Write}`}
             >
               <Box gap={1} display="flex">
                 <Button
@@ -340,7 +341,25 @@ export const List: React.FC<IListProps> = ({
                               >
                                 <Restricted
                                   to={`${MODULE_PERMISSION_NAMES.KnowledgeBank}:${PERMISSIONS.ChangeStatus}`}
-                                  fallBack={row.active ? "Active" : "Inactive"}
+                                  fallBack={
+                                    <Button
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        backgroundColor: `${
+                                          row.active ? "#14cc80" : "#FF4A4A"
+                                        }`,
+                                        width: "85px",
+                                        color: "#ffffff",
+                                        height: "27px",
+                                        fontSize: "14px",
+                                        borderRadius: "4px",
+                                      }}
+                                    >
+                                      {row.active ? "Active" : "Inactive"}
+                                    </Button>
+                                  }
                                 >
                                   <Button
                                     sx={{
@@ -398,15 +417,15 @@ export const List: React.FC<IListProps> = ({
                   ></EnhancedTableWithPagination>
                 </AnimationWrapper>
               ) : (
-                <Loader />
+                <NoDataFound
+                  description={{
+                    primary: "Yet you dont have any Knowledge bank",
+                  }}
+                  action={false}
+                />
               )
             ) : (
-              <NoDataFound
-                description={{
-                  primary: "Yet you dont have any Knowledge bank",
-                }}
-                action={false}
-              />
+              <Loader />
             )}
           </Restricted>
         </CardContent>

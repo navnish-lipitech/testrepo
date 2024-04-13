@@ -44,7 +44,7 @@ export const Listing = () => {
       }}
       fetchBlogPage={RtcAPI.knowledgebank.list}
       onUpdate={RtcAPI.knowledgebank.update}
-      language="English"
+      language="Hindi"
       fetchCategories={RtcAPI.category.list}
       fetchSections={RtcAPI.section.list}
     />
@@ -65,7 +65,6 @@ export const Add = () => {
         console.log("onAddEditSuccuss");
       }}
       uploadFile={RtcAPI.asset.create}
-      onImageDelete={RtcAPI.asset.remove}
       fetchUser={RtcAPI.user.list}
       assetUrl={"https://rtc-dev.s3.ap-south-1.amazonaws.com"}
     />
