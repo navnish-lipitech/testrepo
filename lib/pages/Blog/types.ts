@@ -20,7 +20,8 @@ export interface ICreateProps {
   onAddEditSuccess: any;
   assetUrl: any;
   fetchUser:any;
-  domainUrl:any
+  domainUrl:any;
+  deleteFile:any;
 }
 export type Filters = {
   search: string;

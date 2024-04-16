@@ -35,8 +35,8 @@ devDependencies:
     specifier: 0.0.10
     version: 0.0.10
   '@lipihipi/rtc-ui-components':
-    specifier: ^0.0.15
-    version: 0.0.15(@emotion/react@11.11.4)(@emotion/styled@11.11.0)(@mui/icons-material@5.15.14)(@mui/material@5.15.14)(@mui/x-date-pickers@6.19.8)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(styled-components@5.3.11)
+    specifier: ^0.0.17
+    version: 0.0.17(@emotion/react@11.11.4)(@emotion/styled@11.11.0)(@mui/icons-material@5.15.14)(@mui/material@5.15.14)(@mui/x-date-pickers@6.19.8)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(styled-components@5.3.11)
   '@storybook/addon-actions':
     specifier: ^8.0.5
     version: 8.0.5
@@ -2510,8 +2510,8 @@ packages:
       - debug
     dev: true
 
-  /@lipihipi/rtc-ui-components@0.0.15(@emotion/react@11.11.4)(@emotion/styled@11.11.0)(@mui/icons-material@5.15.14)(@mui/material@5.15.14)(@mui/x-date-pickers@6.19.8)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(styled-components@5.3.11):
-    resolution: {integrity: sha512-+tdwAFAprJed+2WfcmJBtwK5IsBO+P6Cc6N2rYVxjGeQgJp2QXIsDLM83+JoZCtPW0nZvwg78aeO3C3m8WyHGQ==}
+  /@lipihipi/rtc-ui-components@0.0.17(@emotion/react@11.11.4)(@emotion/styled@11.11.0)(@mui/icons-material@5.15.14)(@mui/material@5.15.14)(@mui/x-date-pickers@6.19.8)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(styled-components@5.3.11):
+    resolution: {integrity: sha512-R0LuLAj1LZu37KRGgpbdv51vM82tmXSzhkQoqc2/znPapRrL3wXDNG3Sqys6fo0nB+0YW7gjJRVkpHafYUbb2w==}
     requiresBuild: true
     peerDependencies:
       '@emotion/react': ^11.11.0

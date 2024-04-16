@@ -67,6 +67,8 @@ export const Add = () => {
       uploadFile={RtcAPI.asset.create}
       fetchUser={RtcAPI.user.list}
       assetUrl={"https://rtc-dev.s3.ap-south-1.amazonaws.com"}
+      deleteFile={RtcAPI.asset.remove}
+      domainUrl={"https://stage.restthecase.com"}
     />
   );
 };
@@ -88,6 +90,8 @@ export const Edit = () => {
       }}
       fetchUser={RtcAPI.user.list}
       assetUrl={"https://rtc-dev.s3.ap-south-1.amazonaws.com"}
+      deleteFile={RtcAPI.asset.remove}
+      domainUrl={"https://stage.restthecase.com"}
     />
   );
 };

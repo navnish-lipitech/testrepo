@@ -340,7 +340,7 @@ export const List: React.FC<IListProps> = ({
                                 }}
                               >
                                 <Restricted
-                                  to={`${MODULE_PERMISSION_NAMES.KnowledgeBank}:${PERMISSIONS.ChangeStatus}`}
+                                  to={`${MODULE_PERMISSION_NAMES.KnowledgeBank}:${PERMISSIONS.Edit}`}
                                   fallBack={
                                     <Button
                                       sx={{
@@ -387,28 +387,32 @@ export const List: React.FC<IListProps> = ({
                             </TableCell>
 
                             <TableCell>
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  justifyContent: "center",
-                                  gap: "1rem",
-                                }}
+                              <Restricted
+                                to={`${MODULE_PERMISSION_NAMES.KnowledgeBank}:${PERMISSIONS.Edit}`}
                               >
                                 <Box
                                   sx={{
                                     display: "flex",
                                     justifyContent: "center",
-                                    alignItems: "center",
-                                    width: "40px",
-                                    height: "40px",
-                                    borderRadius: "50%",
-                                    backgroundColor: "#fafafa",
+                                    gap: "1rem",
                                   }}
-                                  onClick={() => onEdit(row?._id)}
                                 >
-                                  <Icon.Edit />
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      justifyContent: "center",
+                                      alignItems: "center",
+                                      width: "40px",
+                                      height: "40px",
+                                      borderRadius: "50%",
+                                      backgroundColor: "#fafafa",
+                                    }}
+                                    onClick={() => onEdit(row?._id)}
+                                  >
+                                    <Icon.Edit />
+                                  </Box>
                                 </Box>
-                              </Box>
+                              </Restricted>
                             </TableCell>
                           </TableRow>
                         ))}

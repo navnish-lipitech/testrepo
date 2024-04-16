@@ -33,7 +33,8 @@ export const AddEdit: React.FC<ICreateProps> = ({
   fetchCategory,
   assetUrl,
   fetchUser,
-  domainUrl
+  domainUrl,
+  deleteFile
 }) => {
   const [sectionList, setSectionList] = useState<any>([]);
   const [userList, setUserList] = useState<any>([]);
@@ -125,7 +126,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
           const payload: any = Object.fromEntries(
             Object.entries(values).filter(([_, value]) => value !== "")
           );
-          if (!payload.seo.metaTags[0].content) {
+          if (payload.seo.metaTags.length === 0 && !payload.seo.metaTags[0]?.content) {
             delete payload.seo.metaTags;
           }
           if (id) {
@@ -150,7 +151,6 @@ export const AddEdit: React.FC<ICreateProps> = ({
           dirty,
           setFieldValue,
           isValid,
-          errors,
         }: any) => {
           return (
             <>
@@ -386,10 +386,10 @@ export const AddEdit: React.FC<ICreateProps> = ({
                       upload={uploadFile}
                       accept={["image/jpeg", "image/jpg", "image/png"]}
                       label={"Banner Image"}
-                      type={"single"}
                       maxSize={"10mb"}
                       assetUrl={assetUrl}
                       required
+                      onDelete={deleteFile}
                     />
                   </Box>
                 </Box>
