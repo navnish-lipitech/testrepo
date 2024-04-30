@@ -126,7 +126,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
           const payload: any = Object.fromEntries(
             Object.entries(values).filter(([_, value]) => value !== "")
           );
-          if (payload.seo.metaTags.length === 0 && !payload.seo.metaTags[0]?.content) {
+          if (payload.seo?.metaTags && payload.seo?.metaTags.length === 0 && !payload.seo.metaTags[0]?.content) {
             delete payload.seo.metaTags;
           }
           if (id) {
@@ -151,7 +151,9 @@ export const AddEdit: React.FC<ICreateProps> = ({
           dirty,
           setFieldValue,
           isValid,
+          errors
         }: any) => {
+          console.log(errors)
           return (
             <>
               <Card>

@@ -44,7 +44,7 @@ export const Listing = () => {
       }}
       fetchBlogPage={RtcAPI.knowledgebank.list}
       onUpdate={RtcAPI.knowledgebank.update}
-      language="Hindi"
+      language="English"
       fetchCategories={RtcAPI.category.list}
       fetchSections={RtcAPI.section.list}
     />
@@ -84,7 +84,7 @@ export const Edit = () => {
       uploadFile={RtcAPI.asset.create}
       fetchSection={RtcAPI.section.list}
       fetchCategory={RtcAPI.category.list}
-      id={"661a0d11fa02a9cc415011aa"}
+      id={"6617e1628f65688897bc2360"}
       onAddEditSuccess={() => {
         console.log("onAddEditSuccuss");
       }}
