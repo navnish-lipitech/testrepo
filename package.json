@@ -1,6 +1,6 @@
 {
   "name": "@lipihipi/rtc-knowledgebank",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "RTC knowledge bank",
   "author": "Navnish Singh",
   "private": false,
@@ -58,7 +58,6 @@
   },
   "devDependencies": {
     "@lipihipi/rtc-client-sdk": "0.0.10",
-    "@lipihipi/rtc-ui-components": "^0.0.17",
     "@storybook/addon-actions": "^8.0.5",
     "@storybook/addon-essentials": "^8.0.5",
     "@storybook/addon-interactions": "^8.0.5",
@@ -92,7 +91,7 @@
   "peerDependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@lipihipi/rtc-ui-components": "^0.0.13",
+    "@lipihipi/rtc-ui-components": "^0.0.22",
     "@mui/icons-material": "^5.14.9",
     "@mui/material": "^5.14.10",
     "react": "^18.2.0",

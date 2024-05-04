@@ -139,3 +139,27 @@ export const createParams = (
 
   return urlParams;
 };
+
+export const createPayload = (obj:AnyObject)=>{
+  if (obj === undefined || obj === null) {
+    return obj;
+  }
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      if (typeof obj[key] === 'object') {
+        if (obj[key] !== null) {
+          createPayload(obj[key]);
+          // Check if the object is empty after removing its properties
+          if (Object.keys(obj[key]).length === 0) {
+            delete obj[key];
+          }
+        } else {
+          delete obj[key]; // Delete property if value is null
+        }
+      } else if (obj[key] === '' || obj[key] === null) { // Check for null values
+        delete obj[key];
+      }
+    }
+  }
+  return obj
+}

@@ -3,6 +3,7 @@ import {
   Button,
   FileUpload,
   Form,
+  ImageCropper,
   InputBox,
   RichTextEditor,
   SelectBox,
@@ -21,6 +22,7 @@ import {
 import { ICreateProps } from "./types";
 import { KnowledgeBankValidation } from "./validation";
 import { languageArr } from "@lib/constants";
+import { createPayload } from "@lib/utils";
 export const AddEdit: React.FC<ICreateProps> = ({
   id,
   onCreate,
@@ -34,13 +36,14 @@ export const AddEdit: React.FC<ICreateProps> = ({
   assetUrl,
   fetchUser,
   domainUrl,
-  deleteFile
+  deleteFile,
 }) => {
   const [sectionList, setSectionList] = useState<any>([]);
   const [userList, setUserList] = useState<any>([]);
   const [categoryList, setCategoryList] = useState<any>([]);
   const [subCategoryList, setSubCategoryList] = useState<any>([]);
   const [section, setSection] = useState<any>(null);
+  const [sectionId, setSectionId] = useState<any>(null);
   const [initialValues, setInitialValues] = useState<any>({
     language: "English",
     title: "",
@@ -60,12 +63,8 @@ export const AddEdit: React.FC<ICreateProps> = ({
     image: "",
     permalink: "",
     canonicalUrl: "",
+    section: "",
   });
-  useEffect(() => {
-    if (id) {
-      fetchBlog();
-    }
-  }, [id]);
   useEffect(() => {
     Promise.all([
       fetchSection({
@@ -74,10 +73,11 @@ export const AddEdit: React.FC<ICreateProps> = ({
         active: true,
       }),
       fetchUser({
-        pageSize: 500,
+        pageSize: 1500,
         isRecent: true,
         active: true,
         status: "Approved",
+        userType: "Lawyer",
       }),
     ]).then((res) => {
       const [sectionData, userData] = res;
@@ -85,15 +85,33 @@ export const AddEdit: React.FC<ICreateProps> = ({
       setUserList(userData.data.data.list);
     });
   }, []);
-  const fetchBlog = async () => {
-    const response: any = await getBlog(id);
-    setInitialValues(response.data.data);
-    fetchCategoryList(response.data.data.section);
-    if(response.data.data.subCategory){
-      fetchSubCategoryList(response.data.data.category);
+  useEffect(() => {
+    if (id) {
+      fetchBlog();
     }
+  }, [id]);
+  useEffect(() => {
+    getSectionValue(sectionId);
+  }, [sectionList, sectionId]);
+
+  const fetchBlog = async () => {
+    await getBlog(id).then((res: any) => {
+      console.log(res.data.data.section);
+      setInitialValues(res.data.data);
+      fetchCategoryList(res.data.data.section);
+      setSectionId(res.data.data.section);
+      if (res.data.data.subCategory) {
+        fetchSubCategoryList(res.data.data.category);
+      }
+    });
   };
 
+  const getSectionValue = (value: any) => {
+    const selectedOption = sectionList.find(
+      (option: any) => option._id === value
+    );
+    setSection(selectedOption);
+  };
   const fetchCategoryList = async (section: any) => {
     const response: any = await fetchCategory({
       pageSize: 500,
@@ -123,12 +141,17 @@ export const AddEdit: React.FC<ICreateProps> = ({
         validationSchema={KnowledgeBankValidation}
         enableReinitialize={true}
         onSubmit={async (values: any) => {
-          const payload: any = Object.fromEntries(
-            Object.entries(values).filter(([_, value]) => value !== "")
-          );
-          if (payload.seo?.metaTags && payload.seo?.metaTags.length === 0 && !payload.seo.metaTags[0]?.content) {
-            delete payload.seo.metaTags;
+          if (values.image && !values?.image?._id) {
+            let imagePayload: any = {
+              file: values.image,
+            };
+            await uploadFile(imagePayload).then((res: any) => {
+              values.image = res.data.data._id;
+            });
           }
+          let payload: any = createPayload(values);
+          console.log(values.image);
+
           if (id) {
             await onUpdate(id, {
               ...payload,
@@ -151,9 +174,10 @@ export const AddEdit: React.FC<ICreateProps> = ({
           dirty,
           setFieldValue,
           isValid,
-          errors
+          handleBlur,
+          errors,
         }: any) => {
-          console.log(errors)
+          console.log(errors);
           return (
             <>
               <Card>
@@ -190,10 +214,8 @@ export const AddEdit: React.FC<ICreateProps> = ({
                         label: value.name,
                       }))}
                       onChange={(e) => {
-                        const selectedOption = sectionList.find(
-                          (option: any) => option._id === e.target.value
-                        );
-                        setSection(selectedOption);
+                        console.log(e.target.value);
+                        getSectionValue(e.target.value);
                         fetchCategoryList(e.target.value);
                         setFieldValue("section", e.target.value);
                       }}
@@ -281,11 +303,11 @@ export const AddEdit: React.FC<ICreateProps> = ({
                         onChange={(e: any) => {
                           setFieldValue(
                             "permalink",
-                            `${domainUrl}/knowledge-bank/${section?.slug}/${values?.name?.trim().replace(/\s+/g, "-")}`
+                            `${domainUrl}/knowledge-bank/${section?.slug}/${values?.name?.trim().replace(/\s+/g, "-").toLowerCase()}`
                           );
                           setFieldValue(
                             "canonicalUrl",
-                            `${domainUrl}/knowledge-bank/${section?.slug}/${values?.name?.trim().replace(/\s+/g, "-")}`
+                            `${domainUrl}/knowledge-bank/${section?.slug}/${values?.name?.trim().replace(/\s+/g, "-").toLowerCase()}`
                           );
                         }}
                       />
@@ -343,57 +365,19 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     name="schema"
                   />
 
-                  <Box
-                    flexGrow={1}
-                    sx={{
-                      "& .row + div": {
-                        mt: 2,
-                        "& > div": {
-                          margin: 0,
-                          gap: "1rem",
-                          width: "100%",
-                          "& svg": {
-                            width: "1.5rem",
-                            height: "1.5rem",
-                          },
-                          "& > div": {
-                            flexGrow: 1,
-                            "& .card-title": {
-                              placeContent: "hrrl",
-                            },
-
-                            "& p": {
-                              margin: 0,
-                            },
-                          },
-                        },
-                      },
-                      "& .col-md-2": {
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mt: 2,
-                      },
-                      "& .custom-file label": {
-                        border: "none",
-                        cursor: "pointer",
-                        background: "#e2e2e2",
-                        padding: "0.2rem 0.5rem",
-                        borderRadius: "4px",
-                      },
-                    }}
-                  >
-                    <FileUpload
-                      name={`image`}
-                      upload={uploadFile}
-                      accept={["image/jpeg", "image/jpg", "image/png"]}
-                      label={"Banner Image"}
-                      maxSize={"10mb"}
-                      assetUrl={assetUrl}
-                      required
-                      onDelete={deleteFile}
-                    />
-                  </Box>
+                  <ImageCropper
+                    id="image"
+                    name={"image"}
+                    label="Upload Image"
+                    previewPic={values?.image}
+                    required
+                    width={250}
+                    ratio={2 / 1}
+                    accept={["image/*"]}
+                    deleteFile={deleteFile}
+                    imageBaseUrl={assetUrl}
+                    previewCrop={false}
+                  />
                 </Box>
                 <Box
                   gap={2}
