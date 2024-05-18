@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Button,
-  FileUpload,
+  Datepicker,
   Form,
   ImageCropper,
   InputBox,
@@ -150,8 +150,6 @@ export const AddEdit: React.FC<ICreateProps> = ({
             });
           }
           let payload: any = createPayload(values);
-          console.log(values.image);
-
           if (id) {
             await onUpdate(id, {
               ...payload,
@@ -174,10 +172,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
           dirty,
           setFieldValue,
           isValid,
-          handleBlur,
-          errors,
         }: any) => {
-          console.log(errors);
           return (
             <>
               <Card>
@@ -193,8 +188,8 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     <SelectBox
                       name="language"
                       size="medium"
-                      required
                       label="Language"
+                      required
                       options={Object.keys(languageArr).map((key) => ({
                         value: key,
                         label: key,
@@ -209,12 +204,12 @@ export const AddEdit: React.FC<ICreateProps> = ({
                       required
                       size="medium"
                       label="Section"
+                      disabled={!sectionList.length}
                       options={sectionList.map((value: any) => ({
                         value: value._id,
                         label: value.name,
                       }))}
                       onChange={(e) => {
-                        console.log(e.target.value);
                         getSectionValue(e.target.value);
                         fetchCategoryList(e.target.value);
                         setFieldValue("section", e.target.value);
@@ -358,6 +353,23 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     label="Meta Keywords"
                     name="seo.metaTags[0].content"
                   />
+                  <FormControl>
+                    <FormLabel>Last Updated Date</FormLabel>
+                    <Datepicker
+                      sx={{ margin: "auto" }}
+                      onChange={(value: string) =>
+                        setFieldValue("lastUpdatedAt", value)
+                      }
+                      value={values.lastUpdatedAt}
+                      name={"lastUpdatedAt"}
+                      variant="outlined"
+                      slotProps={{
+                        textField: {
+                          error: false,
+                        },
+                      }}
+                    />
+                  </FormControl>
                   <InputBox
                     onChange={handleChange}
                     placeholder="Custom Schema"

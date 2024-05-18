@@ -35,8 +35,8 @@ dependencies:
 
 devDependencies:
   '@lipihipi/rtc-client-sdk':
-    specifier: 0.0.10
-    version: 0.0.10
+    specifier: 0.0.24
+    version: 0.0.24
   '@storybook/addon-actions':
     specifier: ^8.0.5
     version: 8.0.5
@@ -2515,8 +2515,8 @@ packages:
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
     dev: true
 
-  /@lipihipi/rtc-client-sdk@0.0.10:
-    resolution: {integrity: sha512-/v8ZVNZ//fhNyzqcmoppxy8SY1r8ZqQfLQnSIB7Twb26kboxGozz1v6BbRvyyRB8GPYziBcFFP8rH83c9fTCZg==}
+  /@lipihipi/rtc-client-sdk@0.0.24:
+    resolution: {integrity: sha512-RANpd3eZCKCCBGGBiQydIjM66IvZTN7R1yEJfOd+g1GG6oe9Jj0s0h4NYZVGSgCdWGDG44AE2jz7v/tJu69mVg==}
     engines: {node: '>=16'}
     dependencies:
       axios: 1.6.8

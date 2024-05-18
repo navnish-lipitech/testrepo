@@ -1,6 +1,6 @@
 {
   "name": "@lipihipi/rtc-knowledgebank",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "RTC knowledge bank",
   "author": "Navnish Singh",
   "private": false,
@@ -57,7 +57,7 @@
     "node": ">=20.0.0"
   },
   "devDependencies": {
-    "@lipihipi/rtc-client-sdk": "0.0.10",
+    "@lipihipi/rtc-client-sdk": "0.0.24",
     "@storybook/addon-actions": "^8.0.5",
     "@storybook/addon-essentials": "^8.0.5",
     "@storybook/addon-interactions": "^8.0.5",

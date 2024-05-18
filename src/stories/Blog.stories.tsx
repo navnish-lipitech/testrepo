@@ -65,7 +65,7 @@ export const Add = () => {
         console.log("onAddEditSuccuss");
       }}
       uploadFile={RtcAPI.asset.create}
-      fetchUser={RtcAPI.user.list}
+      fetchUser={RtcAPI.user.getLawyerList}
       assetUrl={"https://rtc-dev.s3.ap-south-1.amazonaws.com"}
       deleteFile={RtcAPI.asset.remove}
       domainUrl={"https://stage.restthecase.com"}
@@ -88,7 +88,7 @@ export const Edit = () => {
       onAddEditSuccess={() => {
         console.log("onAddEditSuccuss");
       }}
-      fetchUser={RtcAPI.user.list}
+      fetchUser={RtcAPI.user.getLawyerList}
       assetUrl={"https://rtc-dev.s3.ap-south-1.amazonaws.com"}
       deleteFile={RtcAPI.asset.remove}
       domainUrl={"https://stage.restthecase.com"}
