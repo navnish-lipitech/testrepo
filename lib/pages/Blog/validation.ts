@@ -14,7 +14,6 @@ export const KnowledgeBankValidation = yup.object().shape({
   permalink: yup.string().required("Permanent link is required"),
   canonicalUrl: yup.string().required("Canonical url is required"),
   schema: yup.string().optional().nullable(),
-  image: yup.mixed().required("Banner image is required"),
   source: yup.string().optional().nullable(),
   seo:yup.object(SeoJoiSchema).optional()
 });

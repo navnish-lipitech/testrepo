@@ -112,6 +112,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
     );
     setSection(selectedOption);
   };
+
   const fetchCategoryList = async (section: any) => {
     const response: any = await fetchCategory({
       pageSize: 500,
@@ -121,6 +122,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
     });
     setCategoryList(response.data.data.list);
   };
+
   const fetchSubCategoryList = async (parent: any) => {
     const response: any = await fetchCategory({
       pageSize: 500,
@@ -187,7 +189,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     <FormLabel required>Language</FormLabel>
                     <SelectBox
                       name="language"
-                      size="medium"
+                      size="small"
                       label="Language"
                       required
                       options={Object.keys(languageArr).map((key) => ({
@@ -202,7 +204,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     <SelectBox
                       name="section"
                       required
-                      size="medium"
+                      size="small"
                       label="Section"
                       disabled={!sectionList.length}
                       options={sectionList.map((value: any) => ({
@@ -210,9 +212,10 @@ export const AddEdit: React.FC<ICreateProps> = ({
                         label: value.name,
                       }))}
                       onChange={(e) => {
-                        getSectionValue(e.target.value);
-                        fetchCategoryList(e.target.value);
-                        setFieldValue("section", e.target.value);
+                        getSectionValue(e);
+                        fetchCategoryList(e);
+                        // setFieldValue("section", e);
+                        handleChange(e);
                       }}
                     />
                   </FormControl>
@@ -224,10 +227,12 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     placeholder="Title"
                     label="Title"
                     name="name"
+                    size="small"
                   />
                   {values.language &&
                     values.language !== languageArr["English"] && (
                       <InputBox
+                        size="small"
                         required
                         onChange={handleChange}
                         placeholder={`Title in ${values.language}`}
@@ -237,11 +242,11 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     )}
 
                   <FormControl>
-                    <FormLabel required>Category</FormLabel>
+                    <FormLabel required>Parent Category</FormLabel>
                     <SelectBox
                       name="category"
                       required
-                      size="medium"
+                      size="small"
                       label="Category"
                       disabled={!categoryList.length}
                       options={categoryList.map((value: any) => ({
@@ -249,8 +254,8 @@ export const AddEdit: React.FC<ICreateProps> = ({
                         label: value.name,
                       }))}
                       onChange={(e) => {
-                        setFieldValue("category", e.target.value);
-                        fetchSubCategoryList(e.target.value);
+                        handleChange(e);
+                        fetchSubCategoryList(e);
                       }}
                     />
                   </FormControl>
@@ -260,7 +265,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                       name="subCategory"
                       required
                       disabled={!subCategoryList.length}
-                      size="medium"
+                      size="small"
                       label="Sub Category"
                       options={subCategoryList.map((value: any) => ({
                         value: value._id,
@@ -270,6 +275,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     />
                   </FormControl>
                   <InputBox
+                    size="small"
                     onChange={handleChange}
                     placeholder="Source"
                     label="Source"
@@ -280,7 +286,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     <SelectBox
                       name="user"
                       disabled={!userList.length}
-                      size="medium"
+                      size="small"
                       label="Select Author"
                       options={userList.map((value: any) => ({
                         value: value._id,
@@ -289,40 +295,6 @@ export const AddEdit: React.FC<ICreateProps> = ({
                       onChange={handleChange}
                     />
                   </FormControl>
-                  <Box sx={{ width: "max-content" }}>
-                    <FormGroup>
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Mark title as Permalink and Canonical Url"
-                        checked={values.isHeaderMenu}
-                        onChange={(e: any) => {
-                          setFieldValue(
-                            "permalink",
-                            `${domainUrl}/knowledge-bank/${section?.slug}/${values?.name?.trim().replace(/\s+/g, "-").toLowerCase()}`
-                          );
-                          setFieldValue(
-                            "canonicalUrl",
-                            `${domainUrl}/knowledge-bank/${section?.slug}/${values?.name?.trim().replace(/\s+/g, "-").toLowerCase()}`
-                          );
-                        }}
-                      />
-                    </FormGroup>
-                  </Box>
-
-                  <InputBox
-                    required
-                    onChange={handleChange}
-                    placeholder="Permalink"
-                    label="Permalink"
-                    name="permalink"
-                  />
-                  <InputBox
-                    required
-                    onChange={handleChange}
-                    placeholder="Canonical Url"
-                    label="Canonical Url"
-                    name="canonicalUrl"
-                  />
 
                   <RichTextEditor
                     required
@@ -334,6 +306,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     imageBaseUrl={assetUrl}
                   />
                   <InputBox
+                    size="small"
                     required
                     onChange={handleChange}
                     placeholder="Enter meta title"
@@ -341,6 +314,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     name="seo.title"
                   />
                   <InputBox
+                    size="small"
                     required
                     onChange={handleChange}
                     placeholder="Enter meta description"
@@ -348,6 +322,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     name="seo.description"
                   />
                   <InputBox
+                    size="small"
                     onChange={handleChange}
                     placeholder="Meta Keywords"
                     label="Meta Keywords"
@@ -366,11 +341,13 @@ export const AddEdit: React.FC<ICreateProps> = ({
                       slotProps={{
                         textField: {
                           error: false,
+                          size: "small",
                         },
                       }}
                     />
                   </FormControl>
                   <InputBox
+                    size="small"
                     onChange={handleChange}
                     placeholder="Custom Schema"
                     label="Custom Schema"
@@ -382,13 +359,63 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     name={"image"}
                     label="Upload Image"
                     previewPic={values?.image}
-                    required
                     width={250}
                     ratio={2 / 1}
                     accept={["image/*"]}
                     deleteFile={deleteFile}
                     imageBaseUrl={assetUrl}
                     previewCrop={false}
+                  />
+
+                  <Box sx={{ width: "100%" }}>
+                    <Box
+                      display={"inline-flex"}
+                      justifyContent={"flex-end"}
+                      width={"100%"}
+                    >
+                      <Button
+                        sx={{
+                          height: "40px",
+                        }}
+                        color="secondary"
+                        onClick={() => {
+                          setFieldValue(
+                            "permalink",
+                            `${domainUrl}/knowledge-bank/${section?.slug}/${values?.name?.trim().replace(/\s+/g, "-").toLowerCase()}`
+                          );
+                          setFieldValue(
+                            "canonicalUrl",
+                            `${domainUrl}/knowledge-bank/${section?.slug}/${values?.name?.trim().replace(/\s+/g, "-").toLowerCase()}`
+                          );
+                        }}
+                      >
+                        Mark permalink
+                      </Button>
+                    </Box>
+                    {/* <FormGroup>
+                      <FormControlLabel
+                        control={<Checkbox />}
+                        label="Mark title as Permalink and Canonical Url"
+                        checked={values.isHeaderMenu}
+                      />
+                    </FormGroup> */}
+                  </Box>
+
+                  <InputBox
+                    size="small"
+                    required
+                    onChange={handleChange}
+                    placeholder="Permalink"
+                    label="Permalink"
+                    name="permalink"
+                  />
+                  <InputBox
+                    size="small"
+                    required
+                    onChange={handleChange}
+                    placeholder="Canonical Url"
+                    label="Canonical Url"
+                    name="canonicalUrl"
                   />
                 </Box>
                 <Box

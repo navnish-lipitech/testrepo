@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Box, Card, CardContent, IconButton, debounce } from "@mui/material";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
@@ -18,27 +18,135 @@ import {
   PermissionFallback,
   Datepicker,
   SelectBox,
+  useApiContext,
 } from "@lipihipi/rtc-ui-components";
 
-import { BlogHeadCells, createData } from "../../utilities";
+import { BlogHeadCells } from "../../utilities";
 import { Filters, IListProps } from "./types";
 import { MODULE_PERMISSION_NAMES, PERMISSIONS } from "../../constants";
 import { createParams } from "@lib/utils";
 
+const createRow = (props: any) => {
+  const { name, section, category, actions, active, ...rest } = props;
+
+  return (
+    <TableRow hover sx={{ cursor: "pointer" }}>
+      <TableCell sx={{ color: "#000000" }} align="left">
+        {section.name}
+      </TableCell>
+      <TableCell sx={{ color: "#000000" }} align="left">
+        {category.name}
+      </TableCell>
+      <TableCell sx={{ color: "#000000" }} align="left">
+        {name}
+      </TableCell>
+
+      <TableCell align="center">
+        <Text
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Restricted
+            to={`${MODULE_PERMISSION_NAMES.KnowledgeBank}:${PERMISSIONS.Edit}`}
+            fallBack={
+              <Button
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: `${active ? "#14cc80" : "#FF4A4A"}`,
+                  width: "85px",
+                  color: "#ffffff",
+                  height: "27px",
+                  fontSize: "14px",
+                  borderRadius: "4px",
+                }}
+              >
+                {active ? "Active" : "Inactive"}
+              </Button>
+            }
+          >
+            <Button
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: `${active ? "#14cc80" : "#FF4A4A"}`,
+                width: "72px",
+                color: "#ffffff",
+                height: "27px",
+                fontSize: "14px",
+                borderRadius: "4px",
+              }}
+              onClick={() => {
+                actions.changeStatus({
+                  name,
+                  section,
+                  category,
+                  active,
+                  ...rest,
+                });
+              }}
+            >
+              {active ? "Active" : "Inactive"}
+            </Button>
+          </Restricted>
+        </Text>
+      </TableCell>
+
+      <TableCell>
+        <Restricted
+          to={`${MODULE_PERMISSION_NAMES.KnowledgeBank}:${PERMISSIONS.Edit}`}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "1rem",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                backgroundColor: "#fafafa",
+              }}
+              onClick={() =>
+                actions.edit({
+                  name,
+                  section,
+                  category,
+                  ...rest,
+                })
+              }
+            >
+              <Icon.Edit />
+            </Box>
+          </Box>
+        </Restricted>
+      </TableCell>
+    </TableRow>
+  );
+};
+
 export const List: React.FC<IListProps> = ({
   onAdd,
   onEdit,
-  fetchBlogPage,
   onUpdate,
   language,
-  fetchCategories,
-  fetchSections,
 }) => {
-  const [total, setTotal] = useState(0);
+  const { apiHandlers } = useApiContext();
   const [rowsPerPageData, setRowsPerPageData] = useState(10);
   const [loading, setLoading] = useState<boolean>(false);
-  const [pageNumber, setPageNumber] = React.useState(0);
-  const [pageData, setPageData] = useState<any[]>([]);
+  const [data, setData] = useState<any>([]);
+  const [totalCount, setTotalCount] = useState(0);
+
   const [categories, setCategories] = useState<any[]>([]);
   const [sections, setSections] = useState<any[]>([]);
   const [showBlockActivity, setShowBlockActivity] = useState<boolean>(false);
@@ -52,39 +160,30 @@ export const List: React.FC<IListProps> = ({
     category: "",
     section: "",
   });
-  React.useEffect(() => {
-    fetchKnowledgeBankList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, language]);
-  React.useEffect(() => {
-    Promise.all([
-      fetchCategories({
-        pageSize: 500,
-        active: true,
-        isRecent: true,
-        type: "knowledge_bank",
-      }),
-      fetchSections({
-        pageSize: 500,
-        active: true,
-        isRecent: true,
-      }),
-    ]).then((res) => {
-      const [categoriesData, sectionsData] = res;
-      setCategories(categoriesData.data.data.list);
-      setSections(sectionsData.data.data.list);
-    });
-  }, []);
+  const pageRef = useRef({
+    page: 1,
+    pageSize: 10,
+  });
+
+  const actions = {
+    edit: (row: Record<string, any>) => {
+      onEdit(row._id);
+    },
+    changeStatus: (row: Record<string, any>) => {
+      selectedRow.current = row;
+      setShowBlockActivity(true);
+    },
+  };
+
   const onStatusChange = () => {
     return new Promise(async (rs, rj) => {
-      console.log(selectedRow);
       if (selectedRow.current) {
         await onUpdate(selectedRow.current?._id, {
           active: !selectedRow.current.active,
         })
           .then(() => {
-            handleToast("Page Updated Successfully", "success");
-            fetchKnowledgeBankList();
+            handleToast("Blog Updated Successfully", "success");
+            getKnowledgeBanks(pageRef.current.pageSize, pageRef.current.page);
             setShowBlockActivity(false);
             rs("");
           })
@@ -95,42 +194,76 @@ export const List: React.FC<IListProps> = ({
       }
     });
   };
-  const fetchKnowledgeBankList = async (
-    page: number = pageNumber,
-    pageSize: number = rowsPerPageData
-  ) => {
-    try {
-      setRowsPerPageData(pageSize);
-      setLoading(true);
-      const params = createParams({
-        isRecent: "true",
-        page: (page + 1).toString(),
-        language: language,
-        // Optional params
-        ...filters,
-        pageSize: pageSize?.toString(),
-      });
-      const pages = await fetchBlogPage(params);
-      setLoading(false);
-      setTotal(pages.data.data.total);
-      let pageArr = pages.data.data.list.map((ele: any) => {
-        return createData(
-          ele.createdAt,
-          ele.updatedAt,
-          ele._id,
-          ele.active,
-          ele.name,
-          ele?.section?.name,
-          ele?.category?.name,
-          ele.description,
-          ele.canonicalUrl,
-          ele.schema,
-          ele.permalink
-        );
-      });
-      setPageData(pageArr);
-    } catch (error) {}
+
+  const fetchKnowledgeBank = (pageSize?: number, page?: number) => {
+    const params = createParams({
+      isRecent: "true",
+      page: page?.toString(),
+      language: language,
+      // Optional params
+      ...filters,
+      pageSize: pageSize?.toString(),
+    });
+
+    return apiHandlers.fetchBlogPage(params);
   };
+
+  const getKnowledgeBanks = useCallback(
+    (pageSize?: number, page?: number) => {
+      pageRef.current = {
+        page: page ?? 1,
+        pageSize: pageSize ?? 10,
+      };
+      fetchKnowledgeBank(pageSize, page)
+        .then((res: any) => {
+          const data = res.data.data.list;
+          setData(data);
+          setTotalCount(res.data.data.total);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
+    [filters]
+  );
+
+  // const fetchKnowledgeBankList = async (
+  //   page: number = pageNumber,
+  //   pageSize: number = rowsPerPageData
+  // ) => {
+  //   try {
+  //     setLoading(false);
+  //     setTotal(pages.data.data.total);
+  //     let pageArr = pages.data.data.list.map((ele: any) => {
+  //       return createData(
+  //         ele.createdAt,
+  //         ele.updatedAt,
+  //         ele._id,
+  //         ele.active,
+  //         ele.name,
+  //         ele?.section?.name,
+  //         ele?.category?.name,
+  //         ele.description,
+  //         ele.canonicalUrl,
+  //         ele.schema,
+  //         ele.permalink
+  //       );
+  //     });
+  //     setPageData(pageArr);
+  //   } catch (error) {}
+  // };
+
+  const tableData = useMemo(() => {
+    return data.map(({ name, section, category, ...rest }: any) =>
+      createRow({
+        name,
+        section,
+        category,
+        actions,
+        ...rest,
+      })
+    );
+  }, [data]);
 
   const onChangeSearch = debounce(({ target: { value } }: any) => {
     setFilters((prev) => ({ ...prev, search: value }));
@@ -138,12 +271,38 @@ export const List: React.FC<IListProps> = ({
 
   const handlePageChange = (page: number, pageSize: number) => {
     setRowsPerPageData(pageSize);
-    fetchKnowledgeBankList(page, pageSize);
-    setPageNumber(page);
+    getKnowledgeBanks(pageSize, ++page);
   };
+
   const onSubmit = (values: Filters) => {
     setFilters((prev) => ({ ...prev, ...values }));
   };
+
+  React.useEffect(() => {
+    Promise.all([
+      apiHandlers.fetchCategories({
+        pageSize: 500,
+        active: true,
+        isRecent: true,
+        type: "knowledge_bank",
+      }),
+      apiHandlers.fetchSections({
+        pageSize: 500,
+        active: true,
+        isRecent: true,
+      }),
+    ]).then((res) => {
+      const [categoriesData, sectionsData] = res;
+      setCategories(categoriesData.data.data.list);
+      setSections(sectionsData.data.data.list);
+    });
+  }, []);
+
+  React.useEffect(() => {
+    setLoading(true);
+    getKnowledgeBanks();
+  }, [filters, language, getKnowledgeBanks]);
+
   return (
     <>
       <Card>
@@ -304,7 +463,7 @@ export const List: React.FC<IListProps> = ({
             }
           >
             {!loading ? (
-              pageData.length > 0 ? (
+              !!data.length ? (
                 <AnimationWrapper>
                   <EnhancedTableWithPagination
                     stickyHeader={true}
@@ -313,117 +472,16 @@ export const List: React.FC<IListProps> = ({
                     pagination={true}
                     numSelected={0}
                     headCells={BlogHeadCells}
-                    total={total}
+                    total={totalCount}
                     rowsPerPageData={rowsPerPageData}
-                    handlePageChange={(page: number, pageSize: number) =>
-                      handlePageChange(page, pageSize)
-                    }
-                    tableBodyNode={
-                      <>
-                        {pageData.map((row: any) => (
-                          <TableRow hover sx={{ cursor: "pointer" }}>
-                            <TableCell sx={{ color: "#000000" }} align="left">
-                              {row.section}
-                            </TableCell>
-                            <TableCell sx={{ color: "#000000" }} align="left">
-                              {row.category}
-                            </TableCell>
-                            <TableCell sx={{ color: "#000000" }} align="left">
-                              {row.name}
-                            </TableCell>
-
-                            <TableCell align="center">
-                              <Text
-                                sx={{
-                                  display: "flex",
-                                  justifyContent: "center",
-                                }}
-                              >
-                                <Restricted
-                                  to={`${MODULE_PERMISSION_NAMES.KnowledgeBank}:${PERMISSIONS.Edit}`}
-                                  fallBack={
-                                    <Button
-                                      sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        backgroundColor: `${
-                                          row.active ? "#14cc80" : "#FF4A4A"
-                                        }`,
-                                        width: "85px",
-                                        color: "#ffffff",
-                                        height: "27px",
-                                        fontSize: "14px",
-                                        borderRadius: "4px",
-                                      }}
-                                    >
-                                      {row.active ? "Active" : "Inactive"}
-                                    </Button>
-                                  }
-                                >
-                                  <Button
-                                    sx={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      backgroundColor: `${
-                                        row.active ? "#14cc80" : "#FF4A4A"
-                                      }`,
-                                      width: "72px",
-                                      color: "#ffffff",
-                                      height: "27px",
-                                      fontSize: "14px",
-                                      borderRadius: "4px",
-                                    }}
-                                    onClick={() => {
-                                      selectedRow.current = row;
-                                      setShowBlockActivity(true);
-                                    }}
-                                  >
-                                    {row.active ? "Active" : "Inactive"}
-                                  </Button>
-                                </Restricted>
-                              </Text>
-                            </TableCell>
-
-                            <TableCell>
-                              <Restricted
-                                to={`${MODULE_PERMISSION_NAMES.KnowledgeBank}:${PERMISSIONS.Edit}`}
-                              >
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    gap: "1rem",
-                                  }}
-                                >
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      width: "40px",
-                                      height: "40px",
-                                      borderRadius: "50%",
-                                      backgroundColor: "#fafafa",
-                                    }}
-                                    onClick={() => onEdit(row?._id)}
-                                  >
-                                    <Icon.Edit />
-                                  </Box>
-                                </Box>
-                              </Restricted>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </>
-                    }
-                  ></EnhancedTableWithPagination>
+                    handlePageChange={handlePageChange}
+                    tableBodyNode={tableData}
+                  />
                 </AnimationWrapper>
               ) : (
                 <NoDataFound
                   description={{
-                    primary: "Yet you dont have any Knowledge bank",
+                    primary: "No data found",
                   }}
                   action={false}
                 />
