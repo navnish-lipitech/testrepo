@@ -1,6 +1,7 @@
 import * as packageJson from "./package.json";
 
 import react from "@vitejs/plugin-react";
+import { execSync } from "child_process";
 import { resolve } from "path";
 
 import { defineConfig } from "vite";

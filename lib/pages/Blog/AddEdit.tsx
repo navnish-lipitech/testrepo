@@ -119,6 +119,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
       isRecent: true,
       section: section,
       active: true,
+      isParent:true
     });
     setCategoryList(response.data.data.list);
   };
@@ -190,7 +191,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     <SelectBox
                       name="language"
                       size="small"
-                      label="Language"
+                      placeholder="Language"
                       required
                       options={Object.keys(languageArr).map((key) => ({
                         value: key,
@@ -205,13 +206,13 @@ export const AddEdit: React.FC<ICreateProps> = ({
                       name="section"
                       required
                       size="small"
-                      label="Section"
+                      placeholder="Section"
                       disabled={!sectionList.length}
                       options={sectionList.map((value: any) => ({
                         value: value._id,
                         label: value.name,
                       }))}
-                      onChange={(e) => {
+                      onChange={(e:any) => {
                         getSectionValue(e);
                         fetchCategoryList(e);
                         // setFieldValue("section", e);
@@ -220,7 +221,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     />
                   </FormControl>
                   <InputBox
-                    onChange={(e) => {
+                    onChange={(e:any) => {
                       setFieldValue("name", e.target.value);
                     }}
                     required
@@ -247,13 +248,13 @@ export const AddEdit: React.FC<ICreateProps> = ({
                       name="category"
                       required
                       size="small"
-                      label="Category"
+                      placeholder="Category"
                       disabled={!categoryList.length}
                       options={categoryList.map((value: any) => ({
                         value: value._id,
                         label: value.name,
                       }))}
-                      onChange={(e) => {
+                      onChange={(e:any) => {
                         handleChange(e);
                         fetchSubCategoryList(e);
                       }}
@@ -263,10 +264,8 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     <FormLabel>Sub Category</FormLabel>
                     <SelectBox
                       name="subCategory"
-                      required
-                      disabled={!subCategoryList.length}
                       size="small"
-                      label="Sub Category"
+                      placeholder="Sub Category"
                       options={subCategoryList.map((value: any) => ({
                         value: value._id,
                         label: value.name,
@@ -285,7 +284,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     <FormLabel>Author</FormLabel>
                     <SelectBox
                       name="user"
-                      disabled={!userList.length}
+                      disabled={id && values.user}
                       size="small"
                       label="Select Author"
                       options={userList.map((value: any) => ({

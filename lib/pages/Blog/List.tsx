@@ -28,14 +28,13 @@ import { createParams } from "@lib/utils";
 
 const createRow = (props: any) => {
   const { name, section, category, actions, active, ...rest } = props;
-
   return (
     <TableRow hover sx={{ cursor: "pointer" }}>
       <TableCell sx={{ color: "#000000" }} align="left">
-        {section.name}
+        {section?.name}
       </TableCell>
       <TableCell sx={{ color: "#000000" }} align="left">
-        {category.name}
+        {category?.name}
       </TableCell>
       <TableCell sx={{ color: "#000000" }} align="left">
         {name}
@@ -204,7 +203,6 @@ export const List: React.FC<IListProps> = ({
       ...filters,
       pageSize: pageSize?.toString(),
     });
-
     return apiHandlers.fetchBlogPage(params);
   };
 
@@ -224,7 +222,7 @@ export const List: React.FC<IListProps> = ({
           setLoading(false);
         });
     },
-    [filters]
+    [filters,language]
   );
 
   // const fetchKnowledgeBankList = async (
