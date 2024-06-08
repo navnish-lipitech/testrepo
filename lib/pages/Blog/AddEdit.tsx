@@ -96,8 +96,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
 
   const fetchBlog = async () => {
     await getBlog(id).then((res: any) => {
-      console.log(res.data.data.section);
-      setInitialValues(res.data.data);
+      setInitialValues({...res.data.data,isAuthorEnable:res.data.data.user ? true:false});
       fetchCategoryList(res.data.data.section);
       setSectionId(res.data.data.section);
       if (res.data.data.subCategory) {
@@ -284,9 +283,9 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     <FormLabel>Author</FormLabel>
                     <SelectBox
                       name="user"
-                      disabled={id && values.user}
+                      disabled={values.isAuthorEnable}
                       size="small"
-                      label="Select Author"
+                      placeholder="Select Author"
                       options={userList.map((value: any) => ({
                         value: value._id,
                         label: `${value.firstName} ${value.lastName}`,

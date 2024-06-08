@@ -9,6 +9,8 @@ const Template = ({ Component, ...args }: any) => {
   const [user, setUser] = useState<Record<string, any> | null>(null);
 
   React.useEffect(() => {
+    RtcAPI.setSiteUrl("http://127.0.0.1:8888/api/v1");
+
     RtcAPI.auth
       .login({
         email: "admin@restthecase.com",
@@ -65,7 +67,7 @@ export const Add = () => {
         console.log("onAddEditSuccuss");
       }}
       uploadFile={RtcAPI.asset.create}
-      fetchUser={RtcAPI.user.getLawyerList}
+      fetchUser={RtcAPI.user.getSubsLawyerList}
       assetUrl={"https://rtc-dev.s3.ap-south-1.amazonaws.com"}
       deleteFile={RtcAPI.asset.remove}
       domainUrl={"https://stage.restthecase.com"}
@@ -84,11 +86,11 @@ export const Edit = () => {
       uploadFile={RtcAPI.asset.create}
       fetchSection={RtcAPI.section.list}
       fetchCategory={RtcAPI.category.list}
-      id={"6617e1628f65688897bc2358"}
+      id={"6617e1628f65688897bc2360"}
       onAddEditSuccess={() => {
         console.log("onAddEditSuccuss");
       }}
-      fetchUser={RtcAPI.user.getLawyerList}
+      fetchUser={RtcAPI.user.getSubsLawyerList}
       assetUrl={"https://rtc-dev.s3.ap-south-1.amazonaws.com"}
       deleteFile={RtcAPI.asset.remove}
       domainUrl={"https://stage.restthecase.com"}
