@@ -10,19 +10,13 @@ import {
   Text,
   handleToast,
 } from "@lipihipi/rtc-ui-components";
-import {
-  Box,
-  Card,
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
-} from "@mui/material";
+import { Box, Card, FormControl, FormLabel } from "@mui/material";
 import { ICreateProps } from "./types";
 import { KnowledgeBankValidation } from "./validation";
 import { languageArr } from "@lib/constants";
 import { createPayload } from "@lib/utils";
+import cookies from "browser-cookies";
+
 export const AddEdit: React.FC<ICreateProps> = ({
   id,
   onCreate,
@@ -38,6 +32,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
   domainUrl,
   deleteFile,
 }) => {
+  const locale = cookies.get("locale");
   const [sectionList, setSectionList] = useState<any>([]);
   const [userList, setUserList] = useState<any>([]);
   const [categoryList, setCategoryList] = useState<any>([]);
@@ -96,7 +91,15 @@ export const AddEdit: React.FC<ICreateProps> = ({
 
   const fetchBlog = async () => {
     await getBlog(id).then((res: any) => {
-      setInitialValues({...res.data.data,isAuthorEnable:res.data.data.user ? true:false});
+      const languageData = locale ? res.data.data.languages?.[locale] : {};
+
+      // Combine the language data with the rest of the response
+      setInitialValues({
+        ...res.data.data,
+        ...languageData, // Spread the language-specific data at the top level
+        isAuthorEnable: res.data.data.user ? true : false,
+      });
+      
       fetchCategoryList(res.data.data.section);
       setSectionId(res.data.data.section);
       if (res.data.data.subCategory) {
@@ -118,7 +121,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
       isRecent: true,
       section: section,
       active: true,
-      isParent:true
+      isParent: true,
     });
     setCategoryList(response.data.data.list);
   };
@@ -211,7 +214,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                         value: value._id,
                         label: value.name,
                       }))}
-                      onChange={(e:any) => {
+                      onChange={(e: any) => {
                         getSectionValue(e);
                         fetchCategoryList(e);
                         // setFieldValue("section", e);
@@ -220,7 +223,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                     />
                   </FormControl>
                   <InputBox
-                    onChange={(e:any) => {
+                    onChange={(e: any) => {
                       setFieldValue("name", e.target.value);
                     }}
                     required
@@ -253,7 +256,7 @@ export const AddEdit: React.FC<ICreateProps> = ({
                         value: value._id,
                         label: value.name,
                       }))}
-                      onChange={(e:any) => {
+                      onChange={(e: any) => {
                         handleChange(e);
                         fetchSubCategoryList(e);
                       }}

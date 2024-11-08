@@ -86,7 +86,7 @@ export const Edit = () => {
       uploadFile={RtcAPI.asset.create}
       fetchSection={RtcAPI.section.list}
       fetchCategory={RtcAPI.category.list}
-      id={"6617e1628f65688897bc2360"}
+      id={"6617e1628f65688897bc235a"}
       onAddEditSuccess={() => {
         console.log("onAddEditSuccuss");
       }}
